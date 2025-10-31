@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Redirect</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const userLang = navigator.language || navigator.userLanguage; 
+            if (userLang.startsWith('zh')) {
+                window.location.href = 'zh/index.html'; // 中文页面
+            } else {
+                window.location.href = 'zh/index.html'; // 默认页面
+            }
+        });
+    </script>
+</head> 
+<body style="display:none;">
+    <h1>Redirecting...</h1>
+    <p>If you are not redirected automatically, please <a href="zh/index.html">click here</a>.</p>
+</body>
+</html>
