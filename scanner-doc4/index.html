@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NETUM 产品在线手册</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- 配置Tailwind自定义颜色和字体 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36BFFA',
+            accent: '#0F3460',
+            footer: '#1A2B4B',
+            light: '#F8FAFC'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义工具类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .header-gradient {
+        background: linear-gradient(135deg, var(--tw-gradient-stops));
+      }
+      /* 移动端搜索按钮增大触控区域 */
+      .search-btn-touch {
+        @apply relative;
+      }
+      .search-btn-touch::after {
+        content: '';
+        @apply absolute -inset-2 md:inset-0;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <!-- 顶部导航栏 - 水平布局优化 -->
+  <header class="header-gradient from-primary to-secondary text-white shadow-lg sticky top-0 z-50 transition-all duration-300">
+    <!-- 品牌标识与搜索按钮水平布局容器 -->
+    <div class="container mx-auto px-4 py-3 flex flex-row items-center justify-between">
+      <!-- 品牌Logo和名称 -->
+      <div class="flex items-center space-x-3">
+        <div class="bg-white/20 backdrop-blur-sm p-2.5 rounded-lg">
+          <i class="fa fa-book text-2xl md:text-3xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold tracking-tight">NETUM 产品在线手册</h1>
+          <p class="text-white/80 text-xs md:text-sm hidden sm:block">专业技术手册资源库</p>
+        </div>
+      </div>
+      
+      <!-- 搜索按钮 - 保持在右侧 -->
+      <button id="searchBtn" class="search-btn-touch p-2.5 rounded-full hover:bg-white/20 transition-colors flex items-center justify-center">
+        <i class="fa fa-search text-lg sm:text-xl"></i>
+        <span class="ml-2 hidden sm:inline text-sm">搜索手册</span>
+      </button>
+    </div>
+    
+    <!-- 搜索框 (默认隐藏) -->
+    <div id="searchContainer" class="hidden bg-white/10 backdrop-blur-md border-t border-white/20 px-4 py-3 transition-all duration-300">
+      <div class="relative w-full max-w-2xl mx-auto">
+        <input type="text" id="searchInput" placeholder="输入手册名称搜索..." 
+               class="w-full py-3 px-4 pr-10 rounded-lg bg-white/20 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 text-white placeholder-white/60 transition-all text-base">
+        <i class="fa fa-search absolute right-3 top-1/2 -translate-y-1/2 text-white/60 text-lg"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="container mx-auto px-4 py-8 flex-grow">
+    <!-- 页面介绍 -->
+    <div class="text-center mb-10 mt-2">
+      <h2 class="text-[clamp(1.5rem,3vw,2.2rem)] font-bold text-gray-800 mb-3">选择您需要的手册</h2>
+      <p class="text-gray-600 max-w-2xl mx-auto">点击下方手册卡片，进入相应的详细手册页面。所有手册均提供完整的使用说明和技术参数。</p>
+    </div>
+    
+    <!-- 手册卡片网格 -->
+    <div id="manualGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      <!-- 手册卡片将通过JavaScript动态生成 -->
+    </div>
+    
+    <!-- 无结果提示 (默认隐藏) -->
+    <div id="noResults" class="hidden text-center py-16">
+      <i class="fa fa-search-minus text-5xl text-gray-300 mb-4"></i>
+      <p class="text-gray-500 text-lg">未找到匹配的手册</p>
+    </div>
+  </main>
+
+  <script>
+    // 手册文件夹名称列表
+    const manualFolders = [
+      'C990','CS8501','GY-60U','GY-70U','GY-80U','I8','NT-1202W','RD-2023','W8-X','Z3','Z3S'
+    ];
+    
+    // 获取网格容器
+    const manualGrid = document.getElementById('manualGrid');
+    
+    // 生成手册卡片
+    function renderManualCards(folders) {
+      manualGrid.innerHTML = '';
+      
+      if (folders.length === 0) {
+        document.getElementById('noResults').classList.remove('hidden');
+        return;
+      } else {
+        document.getElementById('noResults').classList.add('hidden');
+      }
+      
+      folders.forEach(folder => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-xl overflow-hidden shadow-lg card-shadow card-hover group';
+        
+        card.innerHTML = `
+          <a href="${folder}/" class="block h-full">
+            <div class="aspect-square bg-gray-100 flex items-center justify-center p-4">
+              <img src="media/${folder}.png" alt="${folder}手册" 
+                   class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                   onerror="this.src='https://picsum.photos/300/300?random=${folder}'; this.alt='${folder}手册封面'">
+            </div>
+            <div class="p-4">
+              <h3 class="text-lg font-semibold text-gray-800 truncate">${folder} 手册</h3>
+              <p class="text-gray-500 text-sm mt-1">点击查看详细内容</p>
+            </div>
+          </a>
+        `;
+        
+        manualGrid.appendChild(card);
+      });
+    }
+    
+    // 初始渲染所有手册卡片
+    renderManualCards(manualFolders);
+    
+    // 搜索功能
+    const searchBtn = document.getElementById('searchBtn');
+    const searchContainer = document.getElementById('searchContainer');
+    const searchInput = document.getElementById('searchInput');
+    
+    // 搜索框显示/隐藏功能
+    searchBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      searchContainer.classList.toggle('hidden');
+      if (!searchContainer.classList.contains('hidden')) {
+        searchInput.focus();
+      }
+    });
+    
+    searchContainer.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+    
+    // 搜索功能实现
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase().trim();
+      
+      if (searchTerm === '') {
+        renderManualCards(manualFolders);
+      } else {
+        const filteredFolders = manualFolders.filter(folder => 
+          folder.toLowerCase().includes(searchTerm)
+        );
+        renderManualCards(filteredFolders);
+      }
+    });
+    
+    // 点击页面其他区域关闭搜索框
+    document.addEventListener('click', () => {
+      searchContainer.classList.add('hidden');
+    });
+    
+    // 按ESC键关闭搜索框
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        searchContainer.classList.add('hidden');
+      }
+    });
+    
+    // 滚动时改变导航栏样式
+    window.addEventListener('scroll', () => {
+      const header = document.querySelector('header');
+      if (window.scrollY > 10) {
+        header.classList.add('py-1');
+        header.classList.remove('py-3');
+      } else {
+        header.classList.add('py-3');
+        header.classList.remove('py-1');
+      }
+    });
+  </script>
+</body>
+</html>
